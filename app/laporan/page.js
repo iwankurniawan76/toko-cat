@@ -40,7 +40,7 @@ const SalesReport = () => {
       console.log("Token refreshed:", decoded);
     } catch (err) {
       console.log("Failed to refresh token:", err);
-      router.push("login");
+      router.push("/");
     }
   };
 
