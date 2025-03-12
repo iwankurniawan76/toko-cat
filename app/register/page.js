@@ -68,7 +68,7 @@ export default function RegisterForm() {
       className="flex min-h-screen items-center bg-gray-500"
     >
       <div className="w-full max-w-md p-8 space-y-4 rounded shadow-lg ml-auto mr-8 bg-slate-300">
-        <h2 className="text-2xl font-bold text-center text-gray-800">Register User</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800">Register</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Nama */}
           <div>

@@ -41,6 +41,11 @@ const Penjualan = () => {
   const [status, setStatus] = useState("");
   const router = useRouter();
 
+  const [page, setPage] = useState(1);
+  const limit = 5; // ⬅️ Batasi hanya 5 item per halaman
+  const [totalCount, setTotalCount] = useState(0);
+  const totalPages = Math.ceil(totalCount / limit);
+
   // refresh token
   const refreshToken = async () => {
     try {
@@ -66,14 +71,32 @@ const Penjualan = () => {
     }
   };
 
+  const fetchBarang = async () => {
+    try {
+      const response = await axios.get("http://localhost:5500/penjualan/search", {
+        params: { keySearch: searchBarang, page, limit },
+      });
+
+      setBarang(response.data.brg);
+      setTotalCount(response.data.totalCount);
+    } catch (error) {
+      console.error("Gagal mencari data barang:", error);
+    }
+  };
+
   const handleSearchBarang = async (e) => {
     const searchValue = e.target.value;
     setSearchBarang(searchValue);
     try {
-      const response = await axios.get(`http://localhost:5500/penjualans/${searchValue}`);
-      setBarang(response.data);
+      const response = await axios.get(`http://localhost:5500/penjualan/search`, {
+        params: { keySearch: searchValue, page: page }, // Kirim sebagai queri
+      });
+      setBarang(response.data.brg);
+      setTotalCount(response.data.totalCount);
+      setSearchBarang(e.target.value);
+      setPage(1); // Reset ke halaman pertama saat mencari ulang
     } catch (error) {
-      console.log("Gagal mencari data barang:", error.message);
+      console.log("Gagal mencari data barang:", error);
     }
   };
 
@@ -97,7 +120,9 @@ const Penjualan = () => {
     const searchValue = e.target.value;
     setSearchPembeli(searchValue);
     try {
-      const response = await axios.get(`http://localhost:5500/members/${searchValue}`);
+      const response = await axios.get(`http://localhost:5500/members/search`, {
+        params: { keySearch: searchValue }, // Kirim sebagai queri
+      });
       setDataPembeli(response.data);
     } catch (error) {
       console.log("Gagal mencari data member:", error.message);
@@ -127,7 +152,7 @@ const Penjualan = () => {
   // Tambah barang ke Rincian penjualan
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // cek apakah nama pembeli di klik dari list
+    // cek apakah nama Barang di klik dari list
     if (idBarang === "") {
       setSearchBarang("");
       setBarang([]);
@@ -321,7 +346,7 @@ const Penjualan = () => {
           "Content-Type": "application/json",
         },
       });
-      router.push("/login");
+      router.push("/");
     } catch (err) {
       console.log(err);
     }
@@ -346,6 +371,11 @@ const Penjualan = () => {
     setNoPenjualan(noPenjualan);
   }, []);
 
+  // ✅ Gunakan useEffect agar data berubah saat `page` berubah
+  useEffect(() => {
+    fetchBarang();
+  }, [page]); // Tambahkan `page` sebagai dependensi
+
   return (
     <div>
       <Navbar nama={nama} status={status} fotoProfile={fotoProfile} logout={logout} />
@@ -365,18 +395,30 @@ const Penjualan = () => {
           {/* Pilih Barang */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">Nama Barang</label>
-            <input type="search" value={searchBarang || ""} onChange={handleSearchBarang} placeholder="Cari nama barang" className="border rounded w-full py-2 px-3" required />
+            <input type="search" value={searchBarang} onChange={handleSearchBarang} placeholder="Cari nama barang" className="border rounded w-full py-2 px-3" required />
             {barang.length > 0 && (
-              <ul>
-                {barang.map((b) => (
-                  <li key={b.id}>
-                    <span className="cursor-pointer" onClick={() => handleSelectBarang(b)}>
-                      {b.produk}--{b.distributor}--{b.merek}--{b.satuan}--
-                      {b.h_jual}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <div>
+                <ul>
+                  {barang.map((b) => (
+                    <li key={b.id}>
+                      <span className="cursor-pointer" onClick={() => handleSelectBarang(b)}>
+                        {b.produk}--{b.distributor}--{b.merek}--{b.satuan}--{b.h_jual}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-2 flex justify-between">
+                  <button className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1}>
+                    Sebelumnya
+                  </button>
+                  <span>
+                    Halaman {page} dari {totalPages}
+                  </span>
+                  <button className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50" onClick={() => setPage((prev) => (prev < totalPages ? prev + 1 : prev))} disabled={page >= totalPages}>
+                    Selanjutnya
+                  </button>
+                </div>
+              </div>
             )}
           </div>
           {/* Merek */}

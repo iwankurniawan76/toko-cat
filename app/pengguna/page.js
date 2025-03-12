@@ -60,7 +60,6 @@ export default function ProfileSettings() {
 
   // Upload Foto Profil
   const handleUpload = async (e) => {
-    alert(id);
     e.preventDefault();
     if (!foto) return toast.error("Pilih gambar terlebih dahulu!");
 
@@ -114,7 +113,7 @@ export default function ProfileSettings() {
           "Content-Type": "application/json",
         },
       });
-      router.push("/login");
+      router.push("/");
     } catch (err) {
       console.log(err);
     }

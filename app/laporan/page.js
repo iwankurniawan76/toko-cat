@@ -52,7 +52,7 @@ const SalesReport = () => {
           "Content-Type": "application/json",
         },
       });
-      router.push("/login");
+      router.push("/");
     } catch (err) {
       console.log(err);
     }

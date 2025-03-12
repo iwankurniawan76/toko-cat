@@ -55,6 +55,9 @@ export default function FormInputBarang() {
       }
       const accessToken = response.data;
       const decoded = jwtDecode(accessToken);
+      if (decoded.status !== "admin") {
+        router.push("penjualan");
+      }
       setFotoProfile(decoded.fotoProfil);
       setNama(decoded.nama);
       setStatus(decoded.status);
@@ -220,7 +223,7 @@ export default function FormInputBarang() {
           "Content-Type": "application/json",
         },
       });
-      router.push("/login");
+      router.push("/");
     } catch (err) {
       console.log(err);
     }
@@ -300,7 +303,7 @@ export default function FormInputBarang() {
                 <th className="border border-gray-300 p-2">Satuan</th>
                 <th className="border border-gray-300 p-2">H.Modal</th>
                 <th className="border border-gray-300 p-2">H.Jual</th>
-                <th className="border border-gray-300 p-2">Diskon</th>
+                <th className="border border-gray-300 p-2">Diskon (%)</th>
                 <th className="border border-gray-300 p-2">Aksi</th>
               </tr>
             </thead>
@@ -316,7 +319,7 @@ export default function FormInputBarang() {
                   <td className="border border-gray-300 p-2">{item.satuan}</td>
                   <td className="border border-gray-300 p-2">{item.h_beli.toLocaleString("id-ID")}</td>
                   <td className="border border-gray-300 p-2">{item.h_jual.toLocaleString("id-ID")}</td>
-                  <td className="border border-gray-300 p-2">{item.diskon}</td>
+                  <td className="border border-gray-300 p-2">{item.diskon}%</td>
                   <td className="border border-gray-300 p-2">
                     <button onClick={() => handleEdit(item)} className="bg-yellow-500 text-white px-2 py-1 rounded mr-2">
                       Edit

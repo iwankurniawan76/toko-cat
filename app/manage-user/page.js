@@ -36,6 +36,9 @@ const UserForm = () => {
       }
       const accessToken = response.data;
       const decoded = jwtDecode(accessToken);
+      if (decoded.status !== "admin") {
+        router.push("penjualan");
+      }
       setFotoProfile(decoded.fotoProfil);
       setNama(decoded.nama);
       setStatus(decoded.status);
@@ -120,7 +123,7 @@ const UserForm = () => {
           "Content-Type": "application/json",
         },
       });
-      router.push("/login");
+      router.push("/");
     } catch (err) {
       console.log(err);
     }
